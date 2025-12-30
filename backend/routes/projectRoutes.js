@@ -1,0 +1,21 @@
+import express from "express";
+import {
+  createProject,
+  getMyProjects,
+  getProjectById,
+  deleteProject,
+  addMemberToProject
+} from "../controllers/projectController.js";
+import protect from "../middleware/authMiddleware.js";
+import { isProjectAdmin } from "../middleware/roleMiddleware.js";
+import isProjectMember from "../middleware/projectMemberMiddleware.js";
+
+const router = express.Router();
+
+router.post("/", protect, createProject);
+router.get("/", protect, getMyProjects);
+router.get("/:id", protect, isProjectMember, getProjectById);  // project details fetching
+router.delete("/:id", protect, isProjectAdmin, deleteProject);
+router.post("/:id/add-member", protect, isProjectAdmin, addMemberToProject);
+
+export default router;
