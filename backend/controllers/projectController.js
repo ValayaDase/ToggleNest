@@ -1,5 +1,7 @@
 import Project from "../models/Project.js";
 import User from "../models/User.js";
+import { Notification } from "../models/Notification.js"; 
+import Task from "../models/Task.js";
 
 // CREATE PROJECT
 export const createProject = async (req, res) => {
@@ -52,27 +54,26 @@ export const getProjectById = async (req, res) => {
   }
 };
 
-// DELETE PROJECT (ONLY CREATOR)
 export const deleteProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const projectId = req.params.id;
 
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    // Delete all tasks related to this project
+    await Task.deleteMany({ project: projectId });
 
-    if (project.createdBy.toString() !== req.user.id) {
-      return res.status(403).json({
-        message: "Only project creator can delete this project",
-      });
-    }
+    // Delete notifications related to this project
+    await Notification.deleteMany({ project: projectId });
 
-    await project.deleteOne();
-    res.json({ message: "Project deleted successfully" });
+    // Delete the project itself
+    await Project.findByIdAndDelete(projectId);
+
+    res.status(200).json({ message: "Project deleted successfully." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Server error while deleting project." });
   }
 };
+
 
 // ADD MEMBER (ADMIN ONLY)
 export const addMemberToProject = async (req, res) => {
@@ -84,20 +85,12 @@ export const addMemberToProject = async (req, res) => {
       return res.status(400).json({ message: "User email required" });
     }
 
-    // find user by email
     const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
-
-    // check already member
     if (project.members.includes(user._id)) {
       return res.status(400).json({ message: "User already a member" });
     }
@@ -107,11 +100,7 @@ export const addMemberToProject = async (req, res) => {
 
     res.json({
       message: "Member added successfully",
-      member: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-      },
+      member: { id: user._id, email: user.email, name: user.name },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

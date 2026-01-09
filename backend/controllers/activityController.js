@@ -1,24 +1,32 @@
-import Task from "../models/Task.js";
-import Project from "../models/Project.js";
-import User from "../models/User.js";
+// backend/controllers/activityController.js
+import ActivityLog from "../models/ActivityLog.js";
 
-// get stats for dashboard
-export const getDashboardStats = async(req, res)=>{
-    try{
-        const userId = req.user._id;
+// GET all activities for the logged-in user
+export const getActivities = async (req, res) => {
+  try {
+    const activities = await ActivityLog.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(50); // latest 50 activities
+    res.json(activities);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch activities" });
+  }
+};
 
-        const totalProjects = await Project.countDocuments({members: userId});       //internally members.includes(userId)
-        const totalTasks = await Task.countDocuments({createdBy: userId});
-        const userDetails = await User.findById(userId);
+// Optional: dashboard stats
+export const getDashboardStats = async (req, res) => {
+  try {
+    const totalProjects = 5; // fetch from Projects collection
+    const totalTasks = 20;   // fetch from Tasks collection
 
-        return res.status(200).json({
-            totalProjects,
-            totalTasks,
-            userDetails
-        })
-    }catch(error){
-        console.error("DASHBOARD STATS ERROR:", error.message);
-        return res.status(500).json({message: "Server error"
-        })
-    }
-}
+    res.json({
+      totalProjects,
+      totalTasks,
+      userDetails: { name: req.user.name },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch dashboard stats" });
+  }
+};

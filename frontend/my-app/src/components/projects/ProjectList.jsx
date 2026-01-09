@@ -22,6 +22,11 @@ const ProjectList = () => {
     fetchProjects();
   }, []);
 
+  // Handler to remove deleted project from state
+  const handleProjectDeleted = (deletedId) => {
+    setProjects(projects.filter((proj) => proj._id !== deletedId));
+  };
+
   // Loading State
   if (loading) {
     return (
@@ -48,7 +53,6 @@ const ProjectList = () => {
   // Projects Grid
   return (
     <div className="p-4 md:p-6">
-      
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-1">My Projects</h2>
@@ -58,7 +62,11 @@ const ProjectList = () => {
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <ProjectCard key={project._id} project={project} />
+          <ProjectCard
+            key={project._id}
+            project={project}
+            onProjectDeleted={handleProjectDeleted} // ✅ pass the delete handler
+          />
         ))}
       </div>
     </div>

@@ -6,9 +6,9 @@ import {
   deleteProject,
   addMemberToProject
 } from "../controllers/projectController.js";
-import protect from "../middleware/authMiddleware.js";
 import { isProjectAdmin } from "../middleware/roleMiddleware.js";
 import isProjectMember from "../middleware/projectMemberMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
