@@ -7,7 +7,6 @@ export const deleteAccount = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Delete all user-related data
     await Task.deleteMany({ createdBy: userId });
     await Activity.deleteMany({ user: userId });
     await Project.updateMany({ members: userId }, { $pull: { members: userId } });
