@@ -25,10 +25,14 @@ const taskSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+assignedTo: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+},
 
     order: {
       type: Number,
-      default: 0, // latest on top
+      default: 0, 
     },
   },
   { timestamps: true }

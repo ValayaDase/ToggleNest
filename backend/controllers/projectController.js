@@ -2,8 +2,8 @@ import Project from "../models/Project.js";
 import User from "../models/User.js";
 import { Notification } from "../models/Notification.js"; 
 import Task from "../models/Task.js";
+import Activity from "../models/ActivityLog.js"; 
 
-// CREATE PROJECT
 export const createProject = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -19,13 +19,19 @@ export const createProject = async (req, res) => {
       members: [req.user.id],
     });
 
+    await Activity.create({
+      type: "project_created",
+      message: `Project "${project.name}" was created`,
+      user: req.user.id,
+      project: project._id,
+    });
+
     res.status(201).json(project);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// GET ALL PROJECTS FOR LOGGED-IN USER
 export const getMyProjects = async (req, res) => {
   try {
     const projects = await Project.find({
@@ -38,7 +44,6 @@ export const getMyProjects = async (req, res) => {
   }
 };
 
-// GET SINGLE PROJECT , project details
 export const getProjectById = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id)
@@ -58,13 +63,21 @@ export const deleteProject = async (req, res) => {
   try {
     const projectId = req.params.id;
 
-    // Delete all tasks related to this project
-    await Task.deleteMany({ project: projectId });
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
-    // Delete notifications related to this project
+    await Task.deleteMany({ project: projectId });
     await Notification.deleteMany({ project: projectId });
 
-    // Delete the project itself
+    await Activity.create({
+      type: "project_deleted",
+      message: `Project "${project.name}" was deleted`,
+      user: req.user.id,
+      project: projectId, 
+    });
+
     await Project.findByIdAndDelete(projectId);
 
     res.status(200).json({ message: "Project deleted successfully." });
@@ -75,7 +88,7 @@ export const deleteProject = async (req, res) => {
 };
 
 
-// ADD MEMBER (ADMIN ONLY)
+
 export const addMemberToProject = async (req, res) => {
   try {
     const { email } = req.body;

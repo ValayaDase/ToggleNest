@@ -4,7 +4,6 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// DELETE /users/delete
 router.delete("/delete", protect, deleteAccount);
 
 export default router;

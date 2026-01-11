@@ -6,11 +6,13 @@ import {
   getProjectTasks,
   updateTask,
 } from "../controllers/taskController.js";
+import { assignTask } from "../controllers/taskController.js";
+import { isProjectAdmin } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// CREATE TASK
-// POST /api/tasks/project/:projectId
+
+router.put("/:taskId/assign", protect, isProjectAdmin, assignTask);
 router.post(
   "/project/:projectId",
   protect,
@@ -18,8 +20,7 @@ router.post(
   createTask
 );
 
-// GET PROJECT TASKS
-// GET /api/tasks/project/:projectId
+
 router.get(
   "/project/:projectId",
   protect,
@@ -27,8 +28,7 @@ router.get(
   getProjectTasks
 );
 
-// UPDATE TASK (drag/drop)
-// PUT /api/tasks/:taskId
+
 router.put(
   "/:taskId",
   protect,

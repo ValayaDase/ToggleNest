@@ -6,18 +6,25 @@ import BoardLayout from "../../components/board/BoardLayout";
 import { MdPeople, MdPersonAdd, MdEmail, MdAdminPanelSettings } from "react-icons/md";
 
 const ProjectDetail = () => {
-  const { id } = useParams(); // route: projects/:id
+  const { id } = useParams(); 
   const { user } = useAuth();
 
   const [project, setProject] = useState(null);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // fetch project details
+  // For assign task
+  const [taskIdToAssign, setTaskIdToAssign] = useState("");
+  const [assigneeEmail, setAssigneeEmail] = useState("");
+  const [tasks, setTasks] = useState([]);
+
   const fetchProject = async () => {
     try {
       const res = await api.get(`/projects/${id}`);
       setProject(res.data);
+
+      const taskRes = await api.get(`/tasks/project/${id}`);
+      setTasks(taskRes.data);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to load project");
     }
@@ -27,7 +34,6 @@ const ProjectDetail = () => {
     fetchProject();
   }, [id]);
 
-  // Loading State
   if (!project) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -39,7 +45,6 @@ const ProjectDetail = () => {
 
   const isAdmin = project.createdBy._id === user?.id;
 
-  // add member (admin only)
   const handleAddMember = async () => {
     if (!email.trim()) {
       alert("Enter member email");
@@ -58,10 +63,26 @@ const ProjectDetail = () => {
     }
   };
 
+  const handleAssignTask = async () => {
+    if (!taskIdToAssign || !assigneeEmail) {
+      alert("Select task and member");
+      return;
+    }
+
+    try {
+      await api.put(`/tasks/${taskIdToAssign}/assign`, { email: assigneeEmail });
+      alert("Task assigned successfully");
+      setTaskIdToAssign("");
+      setAssigneeEmail("");
+      fetchProject();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to assign task");
+    }
+  };
+
   return (
     <div className="space-y-6">
       
-      {/* HEADER */}
       <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
@@ -76,7 +97,6 @@ const ProjectDetail = () => {
             )}
           </div>
 
-          {/* ADMIN BADGE */}
           {isAdmin && (
             <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg border border-purple-200">
               <MdAdminPanelSettings className="w-5 h-5 text-purple-700" />
@@ -88,10 +108,8 @@ const ProjectDetail = () => {
         </div>
       </div>
 
-      {/* MEMBERS + ADD MEMBER */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* MEMBERS LIST */}
         <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 lg:col-span-2">
           <div className="flex items-center gap-2 mb-5">
             <MdPeople className="w-6 h-6 text-purple-600" />
@@ -110,25 +128,20 @@ const ProjectDetail = () => {
                 className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-purple-200 hover:bg-purple-50/50 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  {/* Avatar */}
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-semibold">
                     {member.name.charAt(0).toUpperCase()}
                   </div>
 
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">
-                        {member.name}
-                      </span>
+                      <span className="font-medium text-gray-900">{member.name}</span>
 
-                      {/* ADMIN */}
                       {member._id === project.createdBy._id && (
                         <span className="px-2 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700 rounded">
                           Admin
                         </span>
                       )}
 
-                      {/* YOU */}
                       {member._id === user?.id && member._id !== project.createdBy._id && (
                         <span className="px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700 rounded">
                           You
@@ -136,9 +149,7 @@ const ProjectDetail = () => {
                       )}
                     </div>
 
-                    <span className="text-sm text-gray-500">
-                      {member.email}
-                    </span>
+                    <span className="text-sm text-gray-500">{member.email}</span>
                   </div>
                 </div>
               </li>
@@ -146,7 +157,6 @@ const ProjectDetail = () => {
           </ul>
         </div>
 
-        {/* ADD MEMBER (ADMIN ONLY) */}
         {isAdmin && (
           <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center gap-2 mb-5">
@@ -185,10 +195,50 @@ const ProjectDetail = () => {
         )}
       </div>
 
-      {/* TASK BOARD */}
-      <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
-        <BoardLayout />
-      </div>
+      {isAdmin && (
+        <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Assign Task to Member</h2>
+
+          <select
+            value={taskIdToAssign}
+            onChange={(e) => setTaskIdToAssign(e.target.value)}
+            className="w-full mb-3 border px-3 py-2 rounded"
+          >
+            <option value="">Select Task</option>
+            {tasks.map((t) => (
+              <option key={t._id} value={t._id}>
+                {t.title}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={assigneeEmail}
+            onChange={(e) => setAssigneeEmail(e.target.value)}
+            className="w-full mb-3 border px-3 py-2 rounded"
+          >
+            <option value="">Select Member</option>
+            {project.members.map((m) => (
+              <option key={m._id} value={m.email}>
+                {m.name} ({m.email})
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={handleAssignTask}
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-all"
+          >
+            Assign Task
+          </button>
+        </div>
+      )}
+
+     <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
+  <BoardLayout project={project} />
+</div>
+
+
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// backend/routes/activityRoutes.js
 import express from "express";
 import { getActivities, getDashboardStats } from "../controllers/activityController.js";
 import { protect } from "../middleware/authMiddleware.js";
