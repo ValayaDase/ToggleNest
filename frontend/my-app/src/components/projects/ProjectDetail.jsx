@@ -4,6 +4,9 @@ import api from "../../api";
 import { useAuth } from "../../context/AuthContext";
 import BoardLayout from "../../components/board/BoardLayout";
 import { MdPeople, MdPersonAdd, MdEmail, MdAdminPanelSettings } from "react-icons/md";
+import useSocket from "../../hooks/useSocket";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 
 const ProjectDetail = () => {
   const { id } = useParams(); 
@@ -13,7 +16,6 @@ const ProjectDetail = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // For assign task
   const [taskIdToAssign, setTaskIdToAssign] = useState("");
   const [assigneeEmail, setAssigneeEmail] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -29,6 +31,12 @@ const ProjectDetail = () => {
       alert(err.response?.data?.message || "Failed to load project");
     }
   };
+
+  useSocket(project?._id, {
+    projectCompleted: (data) => {
+      toast.success(data.message); 
+    },
+  });
 
   useEffect(() => {
     fetchProject();
@@ -82,42 +90,29 @@ const ProjectDetail = () => {
 
   return (
     <div className="space-y-6">
-      
       <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {project.name}
-            </h1>
-
-            {project.description && (
-              <p className="text-gray-600">
-                {project.description}
-              </p>
-            )}
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{project.name}</h1>
+            {project.description && <p className="text-gray-600">{project.description}</p>}
           </div>
 
           {isAdmin && (
             <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg border border-purple-200">
               <MdAdminPanelSettings className="w-5 h-5 text-purple-700" />
-              <span className="text-sm font-semibold text-purple-700">
-                Project Admin
-              </span>
+              <span className="text-sm font-semibold text-purple-700">Project Admin</span>
             </div>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 lg:col-span-2">
           <div className="flex items-center gap-2 mb-5">
             <MdPeople className="w-6 h-6 text-purple-600" />
-            <h2 className="text-xl font-bold text-gray-800">
-              Team Members
-            </h2>
+            <h2 className="text-xl font-bold text-gray-800">Team Members</h2>
             <span className="ml-auto text-sm font-medium text-gray-500">
-              {project.members.length} {project.members.length === 1 ? 'member' : 'members'}
+              {project.members.length} {project.members.length === 1 ? "member" : "members"}
             </span>
           </div>
 
@@ -161,16 +156,12 @@ const ProjectDetail = () => {
           <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center gap-2 mb-5">
               <MdPersonAdd className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-bold text-gray-800">
-                Add Member
-              </h2>
+              <h2 className="text-xl font-bold text-gray-800">Add Member</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                 <div className="relative">
                   <MdEmail className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
                   <input
@@ -195,50 +186,9 @@ const ProjectDetail = () => {
         )}
       </div>
 
-      {isAdmin && (
-        <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Assign Task to Member</h2>
-
-          <select
-            value={taskIdToAssign}
-            onChange={(e) => setTaskIdToAssign(e.target.value)}
-            className="w-full mb-3 border px-3 py-2 rounded"
-          >
-            <option value="">Select Task</option>
-            {tasks.map((t) => (
-              <option key={t._id} value={t._id}>
-                {t.title}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={assigneeEmail}
-            onChange={(e) => setAssigneeEmail(e.target.value)}
-            className="w-full mb-3 border px-3 py-2 rounded"
-          >
-            <option value="">Select Member</option>
-            {project.members.map((m) => (
-              <option key={m._id} value={m.email}>
-                {m.name} ({m.email})
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={handleAssignTask}
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-all"
-          >
-            Assign Task
-          </button>
-        </div>
-      )}
-
-     <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
-  <BoardLayout project={project} />
-</div>
-
-
+      <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
+        <BoardLayout project={project} />
+      </div>
     </div>
   );
 };

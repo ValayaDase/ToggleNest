@@ -1,6 +1,5 @@
 import Project from "../models/Project.js";
 
-// CHECK IF USER IS PROJECT ADMIN
 export const isProjectAdmin = async (req, res, next) => {
   try {
     const projectId = req.params.id || req.body.projectId;
@@ -21,7 +20,6 @@ export const isProjectAdmin = async (req, res, next) => {
         .json({ message: "Only project admin allowed" });
     }
 
-    // optional: attach project to request
     req.project = project;
 
     next();

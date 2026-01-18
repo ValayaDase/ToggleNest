@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post("/", protect, createProject);
 router.get("/", protect, getMyProjects);
-router.get("/:id", protect, isProjectMember, getProjectById);  // project details fetching
+router.get("/:id", protect, isProjectMember, getProjectById);  
 router.delete("/:id", protect, isProjectAdmin, deleteProject);
 router.post("/:id/add-member", protect, isProjectAdmin, addMemberToProject);
 

@@ -99,23 +99,36 @@ export const addMemberToProject = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const project = await Project.findById(projectId);
-    if (!project) return res.status(404).json({ message: "Project not found" });
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
-    if (project.members.includes(user._id)) {
+    const alreadyMember = project.members.some(
+      (memberId) => memberId.toString() === user._id.toString()
+    );
+
+    if (alreadyMember) {
       return res.status(400).json({ message: "User already a member" });
     }
 
     project.members.push(user._id);
     await project.save();
 
-    res.json({
+    res.status(200).json({
       message: "Member added successfully",
-      member: { id: user._id, email: user.email, name: user.name },
+      member: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -19,22 +19,24 @@ const TaskCard = ({ task }) => {
         ${isDragging ? "opacity-50 rotate-2 scale-105" : ""}
       `}
     >
-      {/* Drag Handle */}
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-sm font-semibold text-gray-900 flex-1 pr-2">
           {task.title}
         </h3>
         <MdDragIndicator className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors flex-shrink-0" />
       </div>
+{task.assignedTo && (
+  <div className="mt-2 text-xs font-medium text-purple-700 bg-purple-100 px-2 py-1 rounded inline-block">
+    Assigned to: {task.assignedTo.name}
+  </div>
+)}
 
-      {/* Description */}
       {task.description && (
         <p className="text-xs text-gray-600 mb-3 line-clamp-2">
           {task.description}
         </p>
       )}
 
-      {/* Creator Info */}
       <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
           <span className="text-[10px] font-semibold text-white">
