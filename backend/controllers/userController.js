@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Task from "../models/Task.js";
 import Project from "../models/Project.js";
 import Activity from "../models/ActivityLog.js";
+import Notification from "../models/Notification. js";
 
 export const deleteAccount = async (req, res) => {
   try {

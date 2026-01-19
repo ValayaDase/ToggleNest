@@ -1,6 +1,7 @@
 import Activity from "../models/ActivityLog.js";
 import Project from "../models/Project.js";
 import Task from "../models/Task.js";
+import Notification from "../models/Notification. js";
 
 export const getActivities = async (req, res) => {
   try {
