@@ -6,13 +6,24 @@ export const getActivities = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const activities = await Activity.find({ user: userId })
+    // ✅ Step 1: User ke sabhi projects find karo
+    const projects = await Project. find({ members: userId }).select("_id");
+    const projectIds = projects.map(p => p._id);
+
+    // ✅ Step 2: Un projects ki sabhi activities fetch karo
+    const activities = await Activity.find({ 
+      project: { $in:  projectIds }  // Project ke saare members ki activities
+    })
       .sort({ createdAt: -1 })
       .limit(20)
       .populate({
         path: "project",
         select: "name",
         options: { strictPopulate: false }, 
+      })
+      .populate({
+        path: "user",  // ✅ Kaun ne activity ki
+        select: "name email",
       });
 
     res.json(activities);

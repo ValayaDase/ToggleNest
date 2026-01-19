@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import Project from "../models/Project.js";
 import { Notification } from "../models/Notification.js";
 import { getIO } from "../socket.js";
-
+import Activity from "../models/ActivityLog.js";
 
 
 export const createTask = async (req, res) => {
@@ -26,10 +26,48 @@ export const createTask = async (req, res) => {
       order,
     });
 
+    //activity log for task create
+    await Activity.create({
+      type: "task_created",
+      message: `Task "${task.title}" was created`,
+      user: req.user.id,
+      project: projectId,
+    });
+
     const io = getIO();
     io.to(projectId).emit("taskCreated", task);
 
     res.status(201).json(task);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    const projectId = task.project. toString();
+    
+    await Task.findByIdAndDelete(taskId);
+
+    //activity log for task delete
+    await Activity.create({
+      type: "task_deleted",
+      message: `Task "${task.title}" was deleted`,
+      user: req.user.id,
+      project: projectId,
+    });
+
+    const io = getIO();
+    io.to(projectId).emit("taskDeleted", { taskId });
+
+    res.json({ message: "Task deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

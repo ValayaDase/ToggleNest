@@ -8,7 +8,8 @@ const activitySchema = new mongoose.Schema({
       "task_completed",
       "task_deleted",
       "project_created",  
-      "project_deleted"   
+      "project_deleted",
+      "member_joined"   
     ],
     required: true,
   },

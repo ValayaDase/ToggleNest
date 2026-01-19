@@ -119,6 +119,14 @@ export const addMemberToProject = async (req, res) => {
     project.members.push(user._id);
     await project.save();
 
+    // Activity log for new member joining
+    await Activity.create({
+      type: "member_joined",
+      message: `${user.name} joined the project "${project.name}"`,
+      user: user._id,  // New member ke liye log
+      project: projectId,
+    });
+
     res.status(200).json({
       message: "Member added successfully",
       member: {

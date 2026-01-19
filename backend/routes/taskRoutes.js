@@ -5,6 +5,7 @@ import {
   createTask,
   getProjectTasks,
   updateTask,
+  deleteTask,
 } from "../controllers/taskController.js";
 import { assignTask } from "../controllers/taskController.js";
 import { isProjectAdmin } from "../middleware/roleMiddleware.js";
@@ -33,6 +34,12 @@ router.put(
   "/:taskId",
   protect,
   updateTask
+);
+
+router.delete(
+  "/:taskId",
+  protect,
+  deleteTask
 );
 
 export default router;
