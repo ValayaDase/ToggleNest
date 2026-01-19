@@ -1,6 +1,7 @@
 import { ITEM_TYPE } from "./dndTypes";
 import { useDrag } from "react-dnd";
-import { MdDragIndicator, MdPerson } from "react-icons/md";
+import { MdDragIndicator, MdPerson, MdDelete } from "react-icons/md";
+import api from "../../api";
 
 const TaskCard = ({ task }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -10,6 +11,17 @@ const TaskCard = ({ task }) => {
       isDragging: monitor.isDragging(),
     }),
   }));
+
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this task?")) return;
+
+    try {
+      await api. delete(`/tasks/${task._id}`);
+    } catch (err) {
+      alert("Failed to delete task");
+    }
+  };
 
   return (
     <div
@@ -23,7 +35,16 @@ const TaskCard = ({ task }) => {
         <h3 className="text-sm font-semibold text-gray-900 flex-1 pr-2">
           {task.title}
         </h3>
-        <MdDragIndicator className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors flex-shrink-0" />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handleDelete}
+            className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
+            title="Delete"
+          >
+            <MdDelete className="w-4 h-4" />
+          </button>
+          <MdDragIndicator className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors flex-shrink-0" />
+        </div>
       </div>
 {task.assignedTo && (
   <div className="mt-2 text-xs font-medium text-purple-700 bg-purple-100 px-2 py-1 rounded inline-block">

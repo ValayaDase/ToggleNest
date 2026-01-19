@@ -1,6 +1,6 @@
-// frontend/src/components/board/ActivityPanel.jsx
 import { useEffect, useState } from "react";
-import api from "../../api"; // your axios instance
+import api from "../../api";
+import { MdHistory } from "react-icons/md"; 
 
 const ActivityPanel = () => {
   const [activities, setActivities] = useState([]);
@@ -8,8 +8,8 @@ const ActivityPanel = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const res = await api.get("/activities"); // backend endpoint
-        setActivities(res.data);
+        const res = await api.get("/activities");
+        setActivities(res. data);
       } catch (err) {
         console.error("Failed to fetch activities:", err);
       }
@@ -23,14 +23,48 @@ const ActivityPanel = () => {
         Recent Activity
       </h2>
 
-      <div className="space-y-2">
-        {activities.length === 0 && <p className="text-gray-500">No recent activity yet.</p>}
+      <div className="space-y-3">
+        {activities.length === 0 && (
+          <p className="text-gray-500 text-sm">No recent activity yet.</p>
+        )}
+        
         {activities.map((activity) => (
-          <div key={activity._id} className="flex items-center gap-2">
-            {activity.type === "task_created" && <span className="text-blue-500">📌</span>}
-            {activity.type === "task_completed" && <span className="text-green-500">✅</span>}
-            {activity.type === "task_deleted" && <span className="text-red-500">🗑️</span>}
-            <span className="text-gray-700">{activity.message}</span>
+          <div 
+            key={activity._id} 
+            className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all"
+          >
+            <div className="flex-shrink-0 mt-0.5">
+              <MdHistory className="w-5 h-5 text-purple-500" />
+            </div>
+
+            {/* Activity details */}
+            <div className="flex-1">
+              <p className="text-sm text-gray-800">{activity.message}</p>
+              
+              <div className="flex items-center gap-2 mt-1 text-xs">
+                {/* Project name */}
+                {activity.project && (
+                  <span className="text-purple-600 font-medium">
+                    {activity.project. name}
+                  </span>
+                )}
+                
+                {/* User who did the activity */}
+                {activity.user && (
+                  <span className="text-gray-500">
+                    • by {activity.user.name}
+                  </span>
+                )}
+                
+                {/* Date */}
+                <span className="text-gray-400">
+                  • {new Date(activity.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            </div>
           </div>
         ))}
       </div>

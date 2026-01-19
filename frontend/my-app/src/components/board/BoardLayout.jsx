@@ -79,6 +79,13 @@ const BoardLayout = ({ project }) => {
         };
       });
     },
+    taskDeleted:  ({ taskId }) => {
+      setTasks((prev) => ({
+        todo: prev.todo.filter((t) => t._id !== taskId),
+        inProgress: prev. inProgress.filter((t) => t._id !== taskId),
+        done: prev.done.filter((t) => t._id !== taskId),
+      }));
+    },
   });
 
   const totalTasks =

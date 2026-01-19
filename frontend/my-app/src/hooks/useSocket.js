@@ -19,6 +19,10 @@ const useSocket = (projectId, handlers = {}) => {
       socket.on("projectCompleted", handlers.projectCompleted);
     }
 
+    if (handlers. taskDeleted) {
+      socket.on("taskDeleted", handlers.taskDeleted);
+    }
+
     return () => {
       socket.off("taskCreated");
       socket.off("taskUpdated");

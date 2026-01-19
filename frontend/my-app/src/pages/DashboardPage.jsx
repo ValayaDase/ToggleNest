@@ -45,7 +45,7 @@ const DashboardPage = () => {
           <p className="text-2xl font-bold">{totalProjects}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-sm">
-          <h3 className="text-sm text-gray-500">Total Tasks</h3>
+          <h3 className="text-sm text-gray-500">Total Tasks Created</h3>
           <p className="text-2xl font-bold">{totalTasks}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-sm">
