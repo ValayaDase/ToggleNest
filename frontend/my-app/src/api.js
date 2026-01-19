@@ -22,16 +22,5 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Optional: handle global auth errors
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response && error.response.status === 401) {
-//       console.warn("Unauthorized - token missing or expired");
-//       // optional: logout user or redirect
-//     }
-//     return Promise.reject(error);
-//   }
-// );
 
 export default api;
