@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import Project from "../models/Project.js";
 import { getIO } from "../socket.js";
 import Activity from "../models/ActivityLog.js";
-import Notification from "../models/Notification. js";
+import Notification from "../models/Notification.js";
 
 
 export const createTask = async (req, res) => {
