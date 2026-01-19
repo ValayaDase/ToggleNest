@@ -5,14 +5,11 @@ import Task from "../models/Task.js";
 export const getActivities = async (req, res) => {
   try {
     const userId = req.user.id;
-
-    // ✅ Step 1: User ke sabhi projects find karo
     const projects = await Project. find({ members: userId }).select("_id");
     const projectIds = projects.map(p => p._id);
 
-    // ✅ Step 2: Un projects ki sabhi activities fetch karo
     const activities = await Activity.find({ 
-      project: { $in:  projectIds }  // Project ke saare members ki activities
+      project: { $in:  projectIds }
     })
       .sort({ createdAt: -1 })
       .limit(20)
@@ -22,7 +19,7 @@ export const getActivities = async (req, res) => {
         options: { strictPopulate: false }, 
       })
       .populate({
-        path: "user",  // ✅ Kaun ne activity ki
+        path: "user", 
         select: "name email",
       });
 

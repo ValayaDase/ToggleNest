@@ -1,6 +1,5 @@
 import Project from "../models/Project.js";
 import User from "../models/User.js";
-import { Notification } from "../models/Notification.js"; 
 import Task from "../models/Task.js";
 import Activity from "../models/ActivityLog.js"; 
 
