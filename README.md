@@ -5,7 +5,17 @@
 ToggleNest is a powerful task management platform developed mainly in JavaScript. It enables teams to dynamically update task in collaborative way also implemented active log updates of all members. Used kanban board with drag and drop feature.
 
 ---
-
+# 🔗 Live link:
+frontend: https://nesttoggle.netlify.app/
+backend:  https://togglenest-6k9t.onrender.com
+credientials 
+1) user1@gmail.com
+     pass: user1
+2) user2@gmail.com
+     pass: user2
+3) user3@gmail.com
+     pass: user3
+   
 ## ✨ Features
 
 - Real-time toggling & updates
