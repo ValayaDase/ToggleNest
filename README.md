@@ -6,8 +6,8 @@ ToggleNest is a powerful task management platform developed mainly in JavaScript
 
 ---
 # 🔗 Live link:
-frontend: https://nesttoggle.netlify.app/
-backend:  https://togglenest-6k9t.onrender.com
+frontend: https://nesttoggle.netlify.app/</br>
+backend:  https://togglenest-6k9t.onrender.com</br>
 credientials 
 1) user1@gmail.com
      pass: user1
